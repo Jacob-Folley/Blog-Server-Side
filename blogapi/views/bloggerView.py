@@ -1,58 +1,58 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from blogapi.serializers import BlogPostSerializer, BlogPostCreateSerializer
-from blogapi.models import BlogPost
+from blogapi.serializers import BloggerSerializer, BloggerCreateSerializer
+from blogapi.models import Blogger
 import uuid
 import base64
 from django.core.files.base import ContentFile
 
 
-class BlogPostView(ViewSet):
+class BloggerView(ViewSet):
     def retrieve(self, request, pk):
-        """Handle GET requests for single BlogPost
+        """Handle GET requests for single Blogger
         Returns:
             Response -- JSON serialized game type"""
         try:
-            blogPost = BlogPost.objects.get(pk=pk)
-            serializer = BlogPostSerializer(blogPost)
+            blogger = Blogger.objects.get(pk=pk)
+            serializer = BloggerSerializer(blogger)
             return Response(serializer.data)
-        except BlogPost.DoesNotExist as ex:
+        except Blogger.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request):
-        """Handle GET requests to get all BlogPost
+        """Handle GET requests to get all Blogger
         Returns:
             Response -- JSON serialized list of game types"""
-        blogPost = BlogPost.objects.all()
-        serializer = BlogPostSerializer(blogPost, many=True)
+        blogger = Blogger.objects.all()
+        serializer = BloggerSerializer(blogger, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        """Handle post requests to BlogPost"""
+        """Handle post requests to Blogger"""
         user = request.auth.user
         format, imgstr = request.data["file"].split(';base64,')
         ext = format.split('/')[-1]
         data = ContentFile(base64.b64decode(imgstr), name=f'{user.username}-{uuid.uuid4()}.{ext}')
-        serializer = BlogPostCreateSerializer(data=request.data)
+        serializer = BloggerCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(picture=data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
-        """Update BlogPost"""
+        """Update Blogger"""
         try:
-            blogPost = BlogPost.objects.get(pk=pk)
-            serializer = BlogPostCreateSerializer(blogPost, data=request.data)
+            blogger = Blogger.objects.get(pk=pk)
+            serializer = BloggerCreateSerializer(blogger, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(None, status=status.HTTP_204_NO_CONTENT)
-        except BlogPost.DoesNotExist as ex:
+        except Blogger.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, pk):
-        """Delete BlogPost"""
-        blogPost = BlogPost.objects.get(pk=pk)
-        blogPost.delete()
+        """Delete Blogger"""
+        blogger = Blogger.objects.get(pk=pk)
+        blogger.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

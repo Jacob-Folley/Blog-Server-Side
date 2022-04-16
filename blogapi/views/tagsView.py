@@ -2,7 +2,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from blogapi.serializers import TagsSerializer, TagsCreateSerializer
-from blogapi.models import Tags, UserType
+from blogapi.models import Tags
 
 
 class TagsView(ViewSet):
